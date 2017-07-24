@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash -e
 
 cd $(dirname $(basename $0))
 echo "Build directory is $(pwd)"
-OS=("darwin" "linux" "windows")
+OS=("darwin" "linux")
 ARCH="amd64"
 NAME="aws-ps"
 
