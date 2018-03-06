@@ -134,7 +134,7 @@ ex)
 /path/to/key/KEY_2 -> value2
 
 $ aws-ps load -p /path/to/key
--DKEY_1=value1 -DKEY_2=value2
+export KEY_1=value1:export KEY_2=value2
 ```
 
 #### `--prefix` prefix
@@ -144,10 +144,16 @@ $ aws-ps load -p /path/to/key
 ex)
 ```
 # paramete store
-/path/to/key/KEY_1 -> value1
-/path/to/key/KEY_2 -> value2
+path.to.key.KEY_1 -> value1
+path.to.key.KEY_2 -> value2
 
-$ aws-ps load -p /path/to/key
--DKEY_1=value1 -DKEY_2=value2
+$ aws-ps load --prefix path.to.key.
+export KEY_1=value1:export KEY_2=value2
 ```
 
+## How to build
+
+1. Clone this repository
+1. `go get -u github.com/golang/dep/cmd/dep`
+1. `dep ensure`
+1. run `./build.sh`
