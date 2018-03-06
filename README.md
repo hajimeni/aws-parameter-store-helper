@@ -1,5 +1,13 @@
 aws-parameter-store-helper
 ----------------
+[![Build Status](https://travis-ci.org/hajimeni/aws-parameter-store-helper.svg?branch=master)](https://travis-ci.org/hajimeni/aws-parameter-store-helper)
+
+## Latest version
+
+- `v0.1.1`
+  - [![Build Status](https://travis-ci.org/hajimeni/aws-parameter-store-helper.svg?branch=v0.1.1)](https://travis-ci.org/hajimeni/aws-parameter-store-helper)
+  - [Download(for mac OS X)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.1/aws-ps-darwin-amd64.tar.gz) 
+  - [Download(for Linux)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.1/aws-ps-linux-amd64.tar.gz) 
 
 ## Usage
 
