@@ -32,11 +32,11 @@ var RootCmd = &cobra.Command{
 
 ex)
   $ aws-ps load -p /path/to/key
-  > export ENV_KEY=value;ENV_KEY_2=valu2
+  > export ENV_KEY=value;ENV_KEY_2=value2
 
 usage)
-  $ eval $(AWS_REGION=ap-northeast-1 aws-ps load -p /path/to/key)
-  then aws-pws will export environment parameters fetched from AWS Parameter Store:
+  $ $(AWS_REGION=ap-northeast-1 aws-ps load -p /path/to/key) && run.sh
+  then aws-ps will export environment parameters fetched from AWS Parameter Store:
 `,
 }
 

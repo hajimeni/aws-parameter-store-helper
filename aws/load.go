@@ -15,6 +15,20 @@ import (
 	"github.com/pkg/errors"
 )
 
+type stdErrLogger struct {
+	logger *log.Logger
+}
+
+func newStdErrLogger() aws.Logger {
+	return &stdErrLogger{
+		logger: log.New(os.Stderr, "", log.LstdFlags),
+	}
+}
+
+func (l stdErrLogger) Log(args ...interface{}) {
+	l.logger.Println(args...)
+}
+
 type LoadFlag struct {
 	Path string
 	Prefix string
@@ -50,9 +64,7 @@ func LoadParameterStore(flag *LoadFlag) {
 	for k, v := range variables {
 		t, err := template.New("v").Parse(flag.Template)
 		if err != nil {
-			log.SetOutput(os.Stderr)
-			log.Print("Template Rendering Error", err)
-			os.Exit(1)
+			log.Fatal("Template Rendering Error", err)
 		}
 		buf := &bytes.Buffer{}
 		t.Execute(buf, map[string]string{"Name": k, "Value": v})
@@ -66,12 +78,25 @@ func LoadParameterStore(flag *LoadFlag) {
 }
 
 func (c *Client) createClient(region string) {
-	config := aws.Config{}
-	if region != "" {
-		config.Region = &region
+	log.SetOutput(os.Stderr)
+
+	sess := session.Must(session.NewSession())
+	logLevel := sess.Config.LogLevel
+	if os.Getenv("DEBUG") != "" {
+		logLevel = aws.LogLevel(aws.LogDebug)
 	}
-	sess := session.Must(session.NewSession(&config))
-	c.Client = ssm.New(sess)
+	if os.Getenv("DEBUG_SIGNING") != "" {
+		logLevel = aws.LogLevel(aws.LogDebugWithSigning)
+	}
+	if os.Getenv("DEBUG_BODY") != "" {
+		logLevel = aws.LogLevel(aws.LogDebugWithSigning | aws.LogDebugWithHTTPBody)
+	}
+
+	config := aws.NewConfig().WithLogger(newStdErrLogger()).WithLogLevel(*logLevel)
+	if region != "" {
+		config = config.WithRegion(region)
+	}
+	c.Client = ssm.New(sess, config)
 }
 
 func (c *Client) loadVariablesByPath(path string, acc map[string]string, nextToken *string) map[string] string {
@@ -87,9 +112,7 @@ func (c *Client) loadVariablesByPath(path string, acc map[string]string, nextTok
 	output, err := c.Client.GetParametersByPath(input)
 
 	if err != nil {
-		log.SetOutput(os.Stderr)
-		log.Print("GetParametersByPath Error", err)
-		os.Exit(1)
+		log.Fatal("GetParametersByPath Error:\n", err)
 	}
 	for _, element := range output.Parameters {
 		name := *element.Name
@@ -116,9 +139,7 @@ func (c Client) loadVariables(prefix string, acc map[string]string, nextToken *s
 	output, err := c.Client.DescribeParameters(input)
 
 	if err != nil {
-		log.SetOutput(os.Stderr)
-		log.Print("DescribeParameters Error", err)
-		os.Exit(1)
+		log.Fatal("DescribeParameters Error", err)
 	}
 	names := []*string{}
 	for _, v := range output.Parameters {
@@ -131,9 +152,7 @@ func (c Client) loadVariables(prefix string, acc map[string]string, nextToken *s
 	}
 	poutput, err := c.Client.GetParameters(pintput)
 	if err != nil {
-		log.SetOutput(os.Stderr)
-		log.Print("GetParameters Error", err)
-		os.Exit(1)
+		log.Fatal("GetParameters Error", err)
 	}
 	for _, element := range poutput.Parameters {
 		name := *element.Name
