@@ -3,6 +3,10 @@ go:
 - 1.8.3
 before_deploy:
 - ./build.sh
+before_install:
+  - go get -t -v ./...
+script:
+  - go test -race -coverprofile=coverage.txt -covermode=atomic
 deploy:
   provider: releases
   api_key:
@@ -13,3 +17,5 @@ deploy:
     tags: true
     all_branches: true
     repo: hajimeni/aws-parameter-store-helper
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
