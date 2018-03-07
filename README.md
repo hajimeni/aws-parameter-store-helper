@@ -110,15 +110,14 @@ Flags:
   -d, --delimiter string            Delimiter each keys (default ";")
       --escape-doublequote string   If double quote (") is included values then escape by this value (default "\\")
   -h, --help                        help for load
-  -p, --path string                 Parameter Store Path, must starts with '/' 
-      --prefix string               Parameter Store Prefix. export KEY is removed prefix
+  -p, --path stringSlice            Parameter Store Path, must starts with '/' 
+      --prefix stringSlice          Parameter Store Prefix. export KEY is removed prefix
       --recursive                   Load recursive Parameter Store Path, '/' is escaped by escape-slash parameter
   -r, --region string               AWS SDK region
       --replace-key-value string    Replace parameter key each replace-keys characters to this value (default "_")
       --replace-keys string         Replace parameter key characters to replace-key-value (default "-/")
   -t, --template string             export format template(Go Template) (default "export {{ .Name }}=\"{{ .Value }}\"")
   -u, --uppercase-key               To upper case each parameter key
-
 ```
 
 #### `-d` delimiter
@@ -137,7 +136,7 @@ $ aws-ps load -p /path/to/key -t '-D{{ .Name }}={{ .Value }}' -d ' '
 -DKEY_1=value1 -DKEY_2=value2
 ```
 
-#### `-p` path
+#### `-p` path (multiple)
 
 starts with `/`
 
@@ -146,12 +145,20 @@ ex)
 # paramete store
 /path/to/key/KEY_1 -> value1
 /path/to/key/KEY_2 -> value2
+/path/to/hoge/KEY_3 -> value3
+/path/to/hoge/KEY_4 -> value4
+/path/to/hoge/KEY_1 -> value5
 
 $ aws-ps load -p /path/to/key
 export KEY_1=value1;export KEY_2=value2
+
+# multiple path 
+$ aws-ps load -p /path/to/key -p /path/to/hoge
+export KEY_1=value5;export KEY_2=value2;export KEY_3=value3;export KEY_4=value4
+
 ```
 
-#### `--prefix` prefix
+#### `--prefix` prefix (multiple)
  
 `aws-ps` exports removed prefix keys.
 

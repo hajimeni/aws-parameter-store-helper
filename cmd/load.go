@@ -37,8 +37,8 @@ func init() {
 	RootCmd.AddCommand(loadCmd)
 	loadCmd.SetOutput(os.Stderr)
 
-	loadCmd.Flags().StringVarP(&loadFlag.Path, "path", "p", "", "Parameter Store Path, must starts with '/' ")
-	loadCmd.Flags().StringVar(&loadFlag.Prefix, "prefix","", "Parameter Store Prefix. export KEY is removed prefix")
+	loadCmd.Flags().StringSliceVarP(&loadFlag.Path, "path", "p", []string{}, "Parameter Store Path, must starts with '/' ")
+	loadCmd.Flags().StringSliceVar(&loadFlag.Prefix, "prefix", []string{}, "Parameter Store Prefix. export KEY is removed prefix")
 	loadCmd.Flags().StringVarP(&loadFlag.Template, "template", "t", "export {{ .Name }}=\"{{ .Value }}\"", "export format template(Go Template)")
 	loadCmd.Flags().StringVarP(&loadFlag.Delimiter,"delimiter", "d", ";", "Delimiter each keys")
 	loadCmd.Flags().StringVarP(&loadFlag.Region, "region", "r", "", "AWS SDK region")

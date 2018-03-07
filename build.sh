@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 cd $(dirname $(basename $0))
 echo "Build directory is $(pwd)"
 OS=("darwin" "linux")

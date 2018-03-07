@@ -30,8 +30,8 @@ func (l stdErrLogger) Log(args ...interface{}) {
 }
 
 type LoadFlag struct {
-	Path string
-	Prefix string
+	Path []string
+	Prefix []string
 	Delimiter string
 	Template string
 	Region string
@@ -49,7 +49,7 @@ type Client struct {
 var client Client = Client{}
 
 func CheckRequiredFlags(flag *LoadFlag) error {
-	if (flag.Path == "" && flag.Prefix == "") {
+	if (len(flag.Path) == 0 && len(flag.Prefix) == 0) {
 		return errors.New("Required Path or Prefix")
 	}
 	client.createClient(flag.Region)
@@ -59,10 +59,10 @@ func CheckRequiredFlags(flag *LoadFlag) error {
 
 func LoadParameterStore(flag *LoadFlag) {
 	var variables map[string]string
-	if flag.Path != "" {
-		variables = client.loadVariablesByPath(flag.Path, flag.Recursive, make(map[string]string), nil)
+	if len(flag.Path) > 0 {
+		variables = client.loadVariablesByPaths(&flag.Path, flag.Recursive)
 	} else {
-		variables = client.loadVariables(flag.Prefix, make(map[string]string), nil)
+		variables = client.loadVariablesByPrefixes(&flag.Prefix)
 	}
 
 	krs := []string{}
@@ -118,6 +118,17 @@ func (c *Client) createClient(region string) {
 	c.Client = ssm.New(sess, config)
 }
 
+func (c *Client) loadVariablesByPaths(paths *[]string, recursive bool) map[string] string {
+	res := make(map[string]string)
+	for _, path := range *paths {
+		r := c.loadVariablesByPath(path, recursive, res, nil)
+		for k, v := range r {
+			res[k] = v
+		}
+	}
+	return res
+}
+
 func (c *Client) loadVariablesByPath(path string, recursive bool, acc map[string]string, nextToken *string) map[string] string {
 
 	input := &ssm.GetParametersByPathInput{
@@ -148,7 +159,18 @@ func (c *Client) loadVariablesByPath(path string, recursive bool, acc map[string
 }
 
 
-func (c Client) loadVariables(prefix string, acc map[string]string, nextToken *string) map[string] string {
+func (c *Client) loadVariablesByPrefixes(prefixes *[]string) map[string] string {
+	res := make(map[string]string)
+	for _, prefix := range *prefixes {
+		r := c.loadVariables(prefix, res, nil)
+		for k, v := range r {
+			res[k] = v
+		}
+	}
+	return res
+}
+
+func (c *Client) loadVariables(prefix string, acc map[string]string, nextToken *string) map[string] string {
 
 	input := &ssm.DescribeParametersInput{
 		MaxResults: aws.Int64(10),
