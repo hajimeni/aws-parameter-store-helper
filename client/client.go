@@ -74,7 +74,7 @@ func NewClient(region string) (Client, error) {
 func (c AwsSsmClient) LoadVariablesByPaths(paths []string, recursive bool) []KeyValue {
 	res := []KeyValue{}
 	for _, path := range paths {
-		r := c.loadVariablesByPath(path, recursive, res, nil)
+		r := c.loadVariablesByPath(path, recursive, []KeyValue{}, nil)
 		res = append(res, r...)
 	}
 	return res
@@ -84,8 +84,8 @@ func (c AwsSsmClient) loadVariablesByPath(path string, recursive bool, acc []Key
 	input := &ssm.GetParametersByPathInput{
 		Path: aws.String(path),
 		WithDecryption: aws.Bool(true),
+		Recursive: aws.Bool(recursive),
 	}
-	input.Recursive = aws.Bool(recursive)
 
 	if nextToken != nil {
 		input.SetNextToken(*nextToken)
@@ -118,7 +118,6 @@ func (c AwsSsmClient) LoadVariablesByPrefixes(prefixes []string) []KeyValue {
 }
 
 func (c AwsSsmClient) loadVariables(prefix string, acc []KeyValue, nextToken *string) []KeyValue {
-
 	input := &ssm.DescribeParametersInput{
 		MaxResults: aws.Int64(10),
 	}
@@ -134,7 +133,6 @@ func (c AwsSsmClient) loadVariables(prefix string, acc []KeyValue, nextToken *st
 	for _, v := range output.Parameters {
 		names = append(names, v.Name)
 	}
-
 	pintput := &ssm.GetParametersInput{
 		Names: names,
 		WithDecryption: aws.Bool(true),
