@@ -1,4 +1,4 @@
-package aws
+package client
 
 import (
 	"github.com/aws/aws-sdk-go/aws"
@@ -8,6 +8,28 @@ import (
 	"os"
 	"strings"
 )
+
+type KeyValue struct {
+	Key string
+	Value string
+}
+
+func newKeyValue(key string, value string) KeyValue {
+	return KeyValue{
+		key,
+		value,
+	}
+}
+
+type Client interface {
+	LoadVariablesByPaths(paths []string, recursive bool) []KeyValue
+	LoadVariablesByPrefixes(prefixes []string) []KeyValue
+}
+
+
+type AwsSsmClient struct {
+	client *ssm.SSM
+}
 
 type stdErrLogger struct {
 	logger *log.Logger
@@ -23,23 +45,7 @@ func (l stdErrLogger) Log(args ...interface{}) {
 	l.logger.Println(args...)
 }
 
-type Client struct {
-	Client *ssm.SSM
-}
-
-type KeyValue struct {
-	Key string
-	Value string
-}
-
-func newKeyValue(key string, value string) KeyValue {
-	return KeyValue{
-		key,
-		value,
-	}
-}
-
-func (c *Client) createClient(region string) {
+func NewClient(region string) (Client, error) {
 	log.SetOutput(os.Stderr)
 
 	sess := session.Must(session.NewSession())
@@ -58,22 +64,23 @@ func (c *Client) createClient(region string) {
 	if region != "" {
 		config = config.WithRegion(region)
 	}
-	c.Client = ssm.New(sess, config)
+	c := AwsSsmClient{
+		ssm.New(sess, config),
+	}
+
+	return c, nil
 }
 
-func (c *Client) loadVariablesByPaths(paths *[]string, recursive bool) []KeyValue {
+func (c AwsSsmClient) LoadVariablesByPaths(paths []string, recursive bool) []KeyValue {
 	res := []KeyValue{}
-	for _, path := range *paths {
+	for _, path := range paths {
 		r := c.loadVariablesByPath(path, recursive, res, nil)
-		for k, v := range r {
-			res[k] = v
-		}
+		res = append(res, r...)
 	}
 	return res
 }
 
-func (c *Client) loadVariablesByPath(path string, recursive bool, acc []KeyValue, nextToken *string) []KeyValue {
-
+func (c AwsSsmClient) loadVariablesByPath(path string, recursive bool, acc []KeyValue, nextToken *string) []KeyValue {
 	input := &ssm.GetParametersByPathInput{
 		Path: aws.String(path),
 		WithDecryption: aws.Bool(true),
@@ -83,7 +90,7 @@ func (c *Client) loadVariablesByPath(path string, recursive bool, acc []KeyValue
 	if nextToken != nil {
 		input.SetNextToken(*nextToken)
 	}
-	output, err := c.Client.GetParametersByPath(input)
+	output, err := c.client.GetParametersByPath(input)
 
 	if err != nil {
 		log.Fatal("GetParametersByPath Error:\n", err)
@@ -101,19 +108,16 @@ func (c *Client) loadVariablesByPath(path string, recursive bool, acc []KeyValue
 	}
 }
 
-
-func (c *Client) loadVariablesByPrefixes(prefixes *[]string) []KeyValue {
+func (c AwsSsmClient) LoadVariablesByPrefixes(prefixes []string) []KeyValue {
 	res := []KeyValue{}
-	for _, prefix := range *prefixes {
+	for _, prefix := range prefixes {
 		r := c.loadVariables(prefix, res, nil)
-		for k, v := range r {
-			res[k] = v
-		}
+		res = append(res, r...)
 	}
 	return res
 }
 
-func (c *Client) loadVariables(prefix string, acc []KeyValue, nextToken *string) []KeyValue {
+func (c AwsSsmClient) loadVariables(prefix string, acc []KeyValue, nextToken *string) []KeyValue {
 
 	input := &ssm.DescribeParametersInput{
 		MaxResults: aws.Int64(10),
@@ -121,7 +125,7 @@ func (c *Client) loadVariables(prefix string, acc []KeyValue, nextToken *string)
 	if nextToken != nil {
 		input.SetNextToken(*nextToken)
 	}
-	output, err := c.Client.DescribeParameters(input)
+	output, err := c.client.DescribeParameters(input)
 
 	if err != nil {
 		log.Fatal("DescribeParameters Error", err)
@@ -135,7 +139,7 @@ func (c *Client) loadVariables(prefix string, acc []KeyValue, nextToken *string)
 		Names: names,
 		WithDecryption: aws.Bool(true),
 	}
-	poutput, err := c.Client.GetParameters(pintput)
+	poutput, err := c.client.GetParameters(pintput)
 	if err != nil {
 		log.Fatal("GetParameters Error", err)
 	}

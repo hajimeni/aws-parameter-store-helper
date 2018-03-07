@@ -1,10 +1,11 @@
-package aws
+package client
 
 import (
 	"testing"
 )
 
 func TestRenderTemplate(t *testing.T) {
+	t.Log("Start TestRenderTamplate")
 	variables := []KeyValue {
 		KeyValue{"key_1", "value_1"},
 		KeyValue{"path/hoge-key_2", "value\"_2"},

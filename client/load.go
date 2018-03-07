@@ -1,4 +1,4 @@
-package aws
+package client
 
 import (
 	"fmt"
@@ -7,7 +7,6 @@ import (
 	"log"
 	"bytes"
 	"strconv"
-	"github.com/pkg/errors"
 )
 
 type LoadFlag struct {
@@ -23,23 +22,17 @@ type LoadFlag struct {
 	EscapeDoublequote string
 }
 
-var client Client = Client{}
-
-func CheckRequiredFlags(flag *LoadFlag) error {
-	if (len(flag.Path) == 0 && len(flag.Prefix) == 0) {
-		return errors.New("Required Path or Prefix")
-	}
-	client.createClient(flag.Region)
-
-	return nil
+type Loader struct {
+	Client Client
 }
 
-func LoadParameterStore(flag *LoadFlag) {
+func LoadParameterStore(client Client, flag *LoadFlag) {
 	var variables []KeyValue
 	if len(flag.Path) > 0 {
-		variables = client.loadVariablesByPaths(&flag.Path, flag.Recursive)
-	} else {
-		variables = client.loadVariablesByPrefixes(&flag.Prefix)
+		variables = append(variables, client.LoadVariablesByPaths(flag.Path, flag.Recursive)...)
+	}
+	if len(flag.Prefix) > 0 {
+		variables = append(variables, client.LoadVariablesByPrefixes(flag.Prefix)...)
 	}
 
 	fmt.Print(renderTemplate(&variables, flag))

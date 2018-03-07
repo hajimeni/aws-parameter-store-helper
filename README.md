@@ -1,7 +1,6 @@
 aws-parameter-store-helper
 ----------------
 [![Build Status](https://travis-ci.org/hajimeni/aws-parameter-store-helper.svg?branch=master)](https://travis-ci.org/hajimeni/aws-parameter-store-helper)
-[![codecov](https://codecov.io/gh/hajimeni/aws-parameter-store-helper/branch/master/graph/badge.svg)](https://codecov.io/gh/hajimeni/aws-parameter-store-helper)
 
 ## Latest version
 

@@ -15,8 +15,9 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/hajimeni/aws-parameter-store-helper/aws"
+	"github.com/hajimeni/aws-parameter-store-helper/client"
 	"os"
+	"errors"
 )
 
 // loadCmd represents the load command
@@ -24,14 +25,18 @@ var loadCmd = &cobra.Command{
 	Use:   "load",
 	Short: "load stored parameter then export formatted string",
 	Run: func(cmd *cobra.Command, args []string) {
-		aws.LoadParameterStore(&loadFlag)
+		c, _ := client.NewClient(loadFlag.Region)
+		client.LoadParameterStore(c, &loadFlag)
 	},
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return aws.CheckRequiredFlags(&loadFlag)
+		if (len(loadFlag.Path) == 0 && len(loadFlag.Prefix) == 0) {
+			return errors.New("Required Path or Prefix")
+		}
+		return nil
 	},
 }
 
-var loadFlag aws.LoadFlag
+var loadFlag client.LoadFlag
 
 func init() {
 	RootCmd.AddCommand(loadCmd)
