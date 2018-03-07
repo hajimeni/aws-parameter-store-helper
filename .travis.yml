@@ -3,13 +3,12 @@ go:
 - 1.8.3
 before_deploy:
 - ./build.sh
-- FILE_TO_UPLOAD=$(ls bin/aws-ps-*.tar.gz)
 deploy:
   provider: releases
   api_key:
     secure: SH0LQIKGGwZv72EBw8hknIiHGe/qh096BhgsqyLiWMGOrnydvSJWD4oxRC6y9p4/D8FqLnBHoUpYgZtk2uGsjOmkjUZRkIe2vwonZOQ61cqbRZr8LNON+KnZmlOO4gcoK8ajRul7Jqm6kDGPln1u37c8ODuugBsdk/AmBVoO17GASt+s1yDxR6cjFEfpQtzZECrByfJzo0GfEeuoFicpNdQPIKdFuW3Z4fgYpQ9UA7YBVCCBTYvdgjEuwFAjlReNSF8u9RkfjABBC7PXTDRt7UwqgyggWdFeMH5/zEx5BudRABBCzFGkuuGLduniQlNFO3pvDA93OxeMalNrLiMTJsD+Z1xww94HLNkEbgk1qQ9OQWeIPEJvoJcxP9WCIBH7xWfhs05Pp14qPOv7mYwr9VJMwePOmMXkHQjEazRxYGe1eczn6sq8scHQ08SGWcsOA0JJ2pJqCP2IU2Yzpp0z9iVoTVE2U1lCJ9g1aVwArkMcRH9xHJ8KMLKdUN4IekXnZVKbdSyTQFZ0YmshOPj6xz6YJ35JgU0vy9JsaXptormZpKUbRhPyhHLw9MVVguJHiK7gHAte1NJsrkptbZg3qjPhd7FxFZo+QGPg6mO8gG5c9ihnD/AqJXBsgcwXiQTLdMVljb7ECseEKzNa3Pfg+qyIuXqd6mO5ijwhXGtTjJA=
   file_glob: true
-  file: "${FILE_TO_UPLOAD}"
+  file: "$TRAVIS_BUILD_DIR/bin/**/*.{tar.gz,zip}"
   on:
     tags: true
     all_branches: true
