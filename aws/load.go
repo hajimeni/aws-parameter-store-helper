@@ -35,6 +35,11 @@ type LoadFlag struct {
 	Delimiter string
 	Template string
 	Region string
+	Recursive bool
+	UpperCaseKey bool
+	ReplaceKeys string
+	ReplaceKeyValue string
+	EscapeDoublequote string
 }
 
 type Client struct {
@@ -55,10 +60,16 @@ func CheckRequiredFlags(flag *LoadFlag) error {
 func LoadParameterStore(flag *LoadFlag) {
 	var variables map[string]string
 	if flag.Path != "" {
-		variables = client.loadVariablesByPath(flag.Path, make(map[string]string), nil)
+		variables = client.loadVariablesByPath(flag.Path, flag.Recursive, make(map[string]string), nil)
 	} else {
 		variables = client.loadVariables(flag.Prefix, make(map[string]string), nil)
 	}
+
+	krs := []string{}
+	for _, rv := range strings.Split(flag.ReplaceKeys, "") {
+		krs = append(krs, rv, flag.ReplaceKeyValue)
+	}
+	kr := strings.NewReplacer(krs...)
 
 	values := []string{}
 	for k, v := range variables {
@@ -67,6 +78,14 @@ func LoadParameterStore(flag *LoadFlag) {
 			log.Fatal("Template Rendering Error", err)
 		}
 		buf := &bytes.Buffer{}
+
+		k = kr.Replace(k)
+		if flag.UpperCaseKey {
+			k = strings.ToUpper(k)
+		}
+		if flag.EscapeDoublequote != "" {
+			v = strings.Replace(v, "\"", flag.EscapeDoublequote + "\"", -1)
+		}
 		t.Execute(buf, map[string]string{"Name": k, "Value": v})
 		values = append(values, buf.String())
 	}
@@ -99,12 +118,13 @@ func (c *Client) createClient(region string) {
 	c.Client = ssm.New(sess, config)
 }
 
-func (c *Client) loadVariablesByPath(path string, acc map[string]string, nextToken *string) map[string] string {
+func (c *Client) loadVariablesByPath(path string, recursive bool, acc map[string]string, nextToken *string) map[string] string {
 
 	input := &ssm.GetParametersByPathInput{
 		Path: aws.String(path),
 		WithDecryption: aws.Bool(true),
 	}
+	input.Recursive = aws.Bool(recursive)
 
 	if nextToken != nil {
 		input.SetNextToken(*nextToken)
@@ -123,7 +143,7 @@ func (c *Client) loadVariablesByPath(path string, acc map[string]string, nextTok
 	if output.NextToken == nil {
 		return acc
 	} else {
-		return c.loadVariablesByPath(path, acc, output.NextToken)
+		return c.loadVariablesByPath(path, recursive, acc, output.NextToken)
 	}
 }
 

@@ -39,9 +39,14 @@ func init() {
 
 	loadCmd.Flags().StringVarP(&loadFlag.Path, "path", "p", "", "Parameter Store Path, must starts with '/' ")
 	loadCmd.Flags().StringVar(&loadFlag.Prefix, "prefix","", "Parameter Store Prefix. export KEY is removed prefix")
-	loadCmd.Flags().StringVarP(&loadFlag.Template, "template", "t", "export {{ .Name }}='{{ .Value }}'", "export format template(Go Template)")
+	loadCmd.Flags().StringVarP(&loadFlag.Template, "template", "t", "export {{ .Name }}=\"{{ .Value }}\"", "export format template(Go Template)")
 	loadCmd.Flags().StringVarP(&loadFlag.Delimiter,"delimiter", "d", ";", "Delimiter each keys")
 	loadCmd.Flags().StringVarP(&loadFlag.Region, "region", "r", "", "AWS SDK region")
+	loadCmd.Flags().BoolVar(&loadFlag.Recursive, "recursive",false, "Load recursive Parameter Store Path, '/' is escaped by escape-slash parameter")
+	loadCmd.Flags().BoolVarP(&loadFlag.UpperCaseKey, "uppercase-key", "u", false, "To upper case each parameter key")
+	loadCmd.Flags().StringVar(&loadFlag.ReplaceKeys, "replace-keys", "-/", "Replace parameter key characters to replace-key-value")
+	loadCmd.Flags().StringVar(&loadFlag.ReplaceKeyValue, "replace-key-value", "_", "Replace parameter key each replace-keys characters to this value")
+	loadCmd.Flags().StringVar(&loadFlag.EscapeDoublequote, "escape-doublequote", "\\", "If double quote (\") is included values then escape by this value")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

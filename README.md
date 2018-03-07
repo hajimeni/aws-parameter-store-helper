@@ -4,10 +4,10 @@ aws-parameter-store-helper
 
 ## Latest version
 
-- `v0.1.1`
-  - [![Build Status](https://travis-ci.org/hajimeni/aws-parameter-store-helper.svg?branch=v0.1.1)](https://travis-ci.org/hajimeni/aws-parameter-store-helper)
-  - [Download(for mac OS X)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.1/aws-ps-darwin-amd64.tar.gz) 
-  - [Download(for Linux)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.1/aws-ps-linux-amd64.tar.gz) 
+- `v0.2.0`
+  - [![Build Status](https://travis-ci.org/hajimeni/aws-parameter-store-helper.svg?branch=v0.2.0)](https://travis-ci.org/hajimeni/aws-parameter-store-helper)
+  - [Download(for mac OS X)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.2.0/aws-ps-darwin-amd64.tar.gz) 
+  - [Download(for Linux)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.2.0/aws-ps-linux-amd64.tar.gz) 
 
 ## Usage
 
@@ -107,12 +107,18 @@ Usage:
   aws-ps load [flags]
 
 Flags:
-  -d, --delimiter string   Delimiter each keys (default ";")
-  -h, --help               help for load
-  -p, --path string        Parameter Store Path, must starts with '/'
-      --prefix string      Parameter Store Prefix. export KEY is removed prefix
-  -r, --region string      AWS SDK region
-  -t, --template string    export format template(Go Template) (default "export {{ .Name }}='{{ .Value }}'")
+  -d, --delimiter string            Delimiter each keys (default ";")
+      --escape-doublequote string   If double quote (") is included values then escape by this value (default "\\")
+  -h, --help                        help for load
+  -p, --path string                 Parameter Store Path, must starts with '/' 
+      --prefix string               Parameter Store Prefix. export KEY is removed prefix
+      --recursive                   Load recursive Parameter Store Path, '/' is escaped by escape-slash parameter
+  -r, --region string               AWS SDK region
+      --replace-key-value string    Replace parameter key each replace-keys characters to this value (default "_")
+      --replace-keys string         Replace parameter key characters to replace-key-value (default "-/")
+  -t, --template string             export format template(Go Template) (default "export {{ .Name }}=\"{{ .Value }}\"")
+  -u, --uppercase-key               To upper case each parameter key
+
 ```
 
 #### `-d` delimiter
@@ -142,7 +148,7 @@ ex)
 /path/to/key/KEY_2 -> value2
 
 $ aws-ps load -p /path/to/key
-export KEY_1=value1:export KEY_2=value2
+export KEY_1=value1;export KEY_2=value2
 ```
 
 #### `--prefix` prefix
@@ -156,7 +162,42 @@ path.to.key.KEY_1 -> value1
 path.to.key.KEY_2 -> value2
 
 $ aws-ps load --prefix path.to.key.
-export KEY_1=value1:export KEY_2=value2
+export KEY_1=value1;export KEY_2=value2
+```
+
+#### `-u` uppercase-key
+
+To upper case each parameter keys
+
+ex)
+```
+# paramete store
+path.to.key.key_1 -> value1
+path.to.key.KEY_2 -> value2
+
+$ aws-ps load --prefix path.to.key. -u
+export KEY_1=value1;export KEY_2=value2
+```
+
+#### `--recursive` recursive
+
+load parameter store recursive by path
+use with `--path` parameter
+
+ex)
+```
+# paramete store
+/path/to/key/KEY_1 -> value1
+/path/to/key/recursive/KEY_2 -> value2
+
+# recurisve
+$ aws-ps load -p /path/to/key --recursive
+export KEY_1=value1;export recursive_KEY_2=value2
+
+# no-recursive(default)
+$ aws-ps load -p /path/to/key
+export KEY_1=value1
+
 ```
 
 ## How to build
