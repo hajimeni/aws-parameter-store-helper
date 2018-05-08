@@ -53,10 +53,10 @@
   revision = "0b12d6b5"
 
 [[projects]]
-  name = "github.com/pkg/errors"
+  branch = "master"
+  name = "github.com/kballard/go-shellquote"
   packages = ["."]
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
+  revision = "95032a82bc518f77982ea72343cc1ade730072f0"
 
 [[projects]]
   name = "github.com/spf13/cobra"
@@ -73,6 +73,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "40e95eda7eee2a024de68e9cf7656bb7dd3e86cf151c0192d6173d78f42350f7"
+  inputs-digest = "4bca163f12f49dd745a71a22d89c41b5b5cd5666a7e0ecc5ca327518179bd924"
   solver-name = "gps-cdcl"
   solver-version = 1

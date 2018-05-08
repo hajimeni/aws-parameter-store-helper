@@ -7,19 +7,21 @@ import (
 	"log"
 	"bytes"
 	"strconv"
+	"github.com/kballard/go-shellquote"
 )
 
 type LoadFlag struct {
-	Path []string
-	Prefix []string
-	Delimiter string
-	Template string
-	Region string
-	Recursive bool
-	UpperCaseKey bool
-	ReplaceKeys string
+	Path            []string
+	Prefix          []string
+	Delimiter       string
+	Template        string
+	Region          string
+	Recursive       bool
+	UpperCaseKey    bool
+	ReplaceKeys     string
 	ReplaceKeyValue string
-	EscapeDoublequote string
+	QuoteShell      bool
+    NoQuoteShell    bool
 }
 
 type Loader struct {
@@ -58,8 +60,8 @@ func renderTemplate(variables *[]KeyValue, flag *LoadFlag) string {
 		if flag.UpperCaseKey {
 			k = strings.ToUpper(k)
 		}
-		if flag.EscapeDoublequote != "" {
-			v = strings.Replace(v, "\"", flag.EscapeDoublequote + "\"", -1)
+		if flag.QuoteShell && !flag.NoQuoteShell {
+			v = shellquote.Join(v)
 		}
 		t.Execute(buf, map[string]string{"Name": k, "Value": v})
 		values = append(values, buf.String())
