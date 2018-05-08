@@ -103,21 +103,24 @@ Use "aws-ps [command] --help" for more information about a command.
 
 ```
 $ aws-ps load --help
+load stored parameter then export formatted string
+
 Usage:
   aws-ps load [flags]
 
 Flags:
-  -d, --delimiter string            Delimiter each keys (default ";")
-      --escape-doublequote string   If double quote (") is included values then escape by this value (default "\\")
-  -h, --help                        help for load
-  -p, --path stringSlice            Parameter Store Path, must starts with '/' 
-      --prefix stringSlice          Parameter Store Prefix. export KEY is removed prefix
-      --recursive                   Load recursive Parameter Store Path, '/' is escaped by escape-slash parameter
-  -r, --region string               AWS SDK region
-      --replace-key-value string    Replace parameter key each replace-keys characters to this value (default "_")
-      --replace-keys string         Replace parameter key characters to replace-key-value (default "-/")
-  -t, --template string             export format template(Go Template) (default "export {{ .Name }}=\"{{ .Value }}\"")
-  -u, --uppercase-key               To upper case each parameter key
+  -d, --delimiter string           Delimiter each keys (default ";")
+  -h, --help                       help for load
+      --no-quote-shell             No quote shell characters
+  -p, --path stringSlice           Parameter Store Path, must starts with '/' 
+      --prefix stringSlice         Parameter Store Prefix. export KEY is removed prefix
+      --quote-shell                Quote shell characters (default true)
+      --recursive                  Load recursive Parameter Store Path, '/' is escaped by escape-slash parameter
+  -r, --region string              AWS SDK region
+      --replace-key-value string   Replace parameter key each replace-keys characters to this value (default "_")
+      --replace-keys string        Replace parameter key characters to replace-key-value (default "-/")
+  -t, --template string            export format template(Go Template) (default "export {{ .Name }}=\"{{ .Value }}\"")
+  -u, --uppercase-key              To upper case each parameter key
 ```
 
 #### `-d` delimiter
@@ -205,6 +208,25 @@ export KEY_1=value1;export recursive_KEY_2=value2
 $ aws-ps load -p /path/to/key
 export KEY_1=value1
 
+```
+
+#### `--quote-shell` (default=true) `--no-quote-shell` (default=false)
+
+quote variable shell specific characters.
+
+ex)
+```
+# paramete store
+/path/to/key/KEY_1 -> value1
+/path/to/key/KEY_2 -> a[b+c="$\
+
+## --quote-shell
+$ aws-ps load -p /path/to/key 
+export KEY1="value1";export KEY2="a\[b+c=\"\$\\"
+
+## --no-quote-shell
+$ aws-ps load -p /path/to/key --no-quote-shell
+export KEY1="value1";export KEY2="a[b+c="$\"
 ```
 
 ## How to build
