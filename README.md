@@ -6,8 +6,8 @@ aws-parameter-store-helper
 
 - `v0.4.0`
   - [![Build Status](https://travis-ci.org/hajimeni/aws-parameter-store-helper.svg?branch=v0.4.0)](https://travis-ci.org/hajimeni/aws-parameter-store-helper)
-  - [Download(for mac OS X)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-darwin-amd64.tar.gz)
-  - [Download(for Linux)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-linux-amd64.tar.gz)
+  - [Download(for mac OS X)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-darwin-amd64.tar.gz) 
+  - [Download(for Linux)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-linux-amd64.tar.gz) 
 
 ## Usage
 
@@ -214,6 +214,25 @@ export KEY_1=value1;export recursive_KEY_2=value2
 $ aws-ps load -p /path/to/key
 export KEY_1=value1
 
+```
+
+#### `--quote-shell` (default=true) `--no-quote-shell` (default=false)
+
+quote variable shell specific characters.
+
+ex)
+```
+# paramete store
+/path/to/key/KEY_1 -> value1
+/path/to/key/KEY_2 -> a[b+c="$\
+
+## --quote-shell
+$ aws-ps load -p /path/to/key 
+export KEY1="value1";export KEY2="a\[b+c=\"\$\\"
+
+## --no-quote-shell
+$ aws-ps load -p /path/to/key --no-quote-shell
+export KEY1="value1";export KEY2="a[b+c="$\"
 ```
 
 ## How to build

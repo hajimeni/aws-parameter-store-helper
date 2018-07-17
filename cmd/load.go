@@ -51,7 +51,8 @@ func init() {
 	loadCmd.Flags().BoolVarP(&loadFlag.UpperCaseKey, "uppercase-key", "u", false, "To upper case each parameter key")
 	loadCmd.Flags().StringVar(&loadFlag.ReplaceKeys, "replace-keys", "-/", "Replace parameter key characters to replace-key-value")
 	loadCmd.Flags().StringVar(&loadFlag.ReplaceKeyValue, "replace-key-value", "_", "Replace parameter key each replace-keys characters to this value")
-	loadCmd.Flags().StringVar(&loadFlag.EscapeDoublequote, "escape-doublequote", "\\", "If double quote (\") is included values then escape by this value")
+	loadCmd.Flags().BoolVar(&loadFlag.QuoteShell, "quote-shell", true,"Quote shell characters")
+	loadCmd.Flags().BoolVar(&loadFlag.NoQuoteShell, "no-quote-shell", false, "No quote shell characters")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
