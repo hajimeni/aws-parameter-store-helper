@@ -11,13 +11,13 @@ aws-parameter-store-helper
 
 ## Usage
 
-1. Add parameter to [Parameter Store](https://console.aws.amazon.com/ec2/v2/home#Parameters:) using hierarchy in names:
+1. Add parameter to [Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html) using hierarchy in names:
 ```
 $ aws ssm put-parameter --name /path/to/key/ENV_KEY_1 --value "value1" --type SecureString --key-id "alias/aws/ssm" --region ap-northeast-1
 $ aws ssm put-parameter --name /path/to/key/ENV_KEY_2 --value "value2" --type SecureString --key-id "alias/aws/ssm" --region ap-northeast-1
 ```
 
-2. Go to the [Releases Page](/hajimeni/aws-parameter-store-helper/releases) and download the binary for your OS.
+2. Go to the [Releases Page](https://github.com/hajimeni/aws-parameter-store-helper/releases) and download the binary for your OS.
 ```
 $ wget https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.0/aws-parameter-store-helper-linux-amd64.tar.gz
 $ tar xfz aws-parameter-store-helper-linux-amd64.tar.gz
@@ -26,7 +26,12 @@ $ chmod +x aws-ps
 
 3. Start your application with aws-ps
 ```
-$(aws-ps -p /path/to/key -r ap-norhteast-1) && run.sh
+$(aws-ps load -p /path/to/key -r ap-norhteast-1) && run.sh
+```
+or  
+```
+eval $(aws-ps load -p /path/to/key -r ap-northeast-1)
+./run.sh
 ```
 
 ## Example Dockerfile
@@ -35,24 +40,24 @@ $(aws-ps -p /path/to/key -r ap-norhteast-1) && run.sh
     ```
     #!/bin/sh
     env
-    
+
     echo "OK"
     ```
 - Dockerfile
     ```
     FROM amazonlinux:2017.09
-    
+
     RUN yum -y install wget tar
-    
+
     ADD run.sh /run.sh
-    
+
     RUN chmod +x /run.sh
-    
+
     RUN wget https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.0/aws-parameter-store-helper-linux-amd64.tar.gz \
      && tar xfz aws-parameter-store-helper-linux-amd64.tar.gz \
      && chmod +x aws-ps
-     
-    CMD $(aws-ps -p $AWS_PS_PATH -r $AWS_REGION) && run.sh
+
+    CMD $(aws-ps load -p $AWS_PS_PATH -r $AWS_REGION) && run.sh
     ```
 - build and run
     ```
@@ -65,6 +70,7 @@ $(aws-ps -p /path/to/key -r ap-norhteast-1) && run.sh
     ENV_KEY_1=value1
     ENV_KEY_2=value2
     ...
+    OK
     ```
 
 ## Commands
@@ -98,7 +104,7 @@ Flags:
 
 Use "aws-ps [command] --help" for more information about a command.
 ```
-    
+
 ### `load` command Options
 
 ```
@@ -112,7 +118,7 @@ Flags:
   -d, --delimiter string           Delimiter each keys (default ";")
   -h, --help                       help for load
       --no-quote-shell             No quote shell characters
-  -p, --path stringSlice           Parameter Store Path, must starts with '/' 
+  -p, --path stringSlice           Parameter Store Path, must starts with '/'
       --prefix stringSlice         Parameter Store Prefix. export KEY is removed prefix
       --quote-shell                Quote shell characters (default true)
       --recursive                  Load recursive Parameter Store Path, '/' is escaped by escape-slash parameter
@@ -155,14 +161,14 @@ ex)
 $ aws-ps load -p /path/to/key
 export KEY_1=value1;export KEY_2=value2
 
-# multiple path 
+# multiple path
 $ aws-ps load -p /path/to/key -p /path/to/hoge
 export KEY_1=value5;export KEY_2=value2;export KEY_3=value3;export KEY_4=value4
 
 ```
 
 #### `--prefix` prefix (multiple)
- 
+
 `aws-ps` exports removed prefix keys.
 
 ex)
