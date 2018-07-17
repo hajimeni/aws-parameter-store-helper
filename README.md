@@ -6,8 +6,8 @@ aws-parameter-store-helper
 
 - `v0.4.0`
   - [![Build Status](https://travis-ci.org/hajimeni/aws-parameter-store-helper.svg?branch=v0.4.0)](https://travis-ci.org/hajimeni/aws-parameter-store-helper)
-  - [Download(for mac OS X)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-darwin-amd64.tar.gz) 
-  - [Download(for Linux)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-linux-amd64.tar.gz) 
+  - [Download(for mac OS X)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-darwin-amd64.tar.gz)
+  - [Download(for Linux)](https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-ps-linux-amd64.tar.gz)
 
 ## Usage
 
@@ -19,7 +19,7 @@ $ aws ssm put-parameter --name /path/to/key/ENV_KEY_2 --value "value2" --type Se
 
 2. Go to the [Releases Page](https://github.com/hajimeni/aws-parameter-store-helper/releases) and download the binary for your OS.
 ```
-$ wget https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.0/aws-parameter-store-helper-linux-amd64.tar.gz
+$ wget https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-parameter-store-helper-linux-amd64.tar.gz
 $ tar xfz aws-parameter-store-helper-linux-amd64.tar.gz
 $ chmod +x aws-ps
 ```
@@ -53,7 +53,7 @@ eval $(aws-ps load -p /path/to/key -r ap-northeast-1)
 
     RUN chmod +x /run.sh
 
-    RUN wget https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.1.0/aws-parameter-store-helper-linux-amd64.tar.gz \
+    RUN wget https://github.com/hajimeni/aws-parameter-store-helper/releases/download/v0.4.0/aws-parameter-store-helper-linux-amd64.tar.gz \
      && tar xfz aws-parameter-store-helper-linux-amd64.tar.gz \
      && chmod +x aws-ps
 
@@ -227,7 +227,7 @@ ex)
 /path/to/key/KEY_2 -> a[b+c="$\
 
 ## --quote-shell
-$ aws-ps load -p /path/to/key 
+$ aws-ps load -p /path/to/key
 export KEY1="value1";export KEY2="a\[b+c=\"\$\\"
 
 ## --no-quote-shell
